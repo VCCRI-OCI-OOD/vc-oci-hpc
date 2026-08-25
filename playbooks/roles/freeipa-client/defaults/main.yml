@@ -1,0 +1,8 @@
+---
+freeipa_server: ""
+freeipa_realm: ""
+freeipa_domain: ""
+freeipa_enroll_principal: ""
+freeipa_enroll_password: ""
+freeipa_ca_cert_content: ""
+freeipa_ca_cert_path: "/etc/ipa/ca.crt"

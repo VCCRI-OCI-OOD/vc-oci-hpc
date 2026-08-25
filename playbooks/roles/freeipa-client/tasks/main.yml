@@ -1,0 +1,74 @@
+---
+- name: Install FreeIPA client packages (RedHat)
+  become: true
+  yum:
+    name:
+      - freeipa-client
+      - krb5-workstation
+      - sssd
+      - sssd-ipa
+    state: present
+  when: ansible_facts['os_family'] == 'RedHat'
+
+- name: Install FreeIPA client packages (Debian)
+  become: true
+  apt:
+    name:
+      - freeipa-client
+      - krb5-user
+      - sssd
+      - sssd-ipa
+    state: present
+    update_cache: yes
+  when: ansible_facts['distribution'] == 'Ubuntu'
+
+- name: Install FreeIPA CA certificate (if provided)
+  become: true
+  copy:
+    content: "{{ freeipa_ca_cert_content }}"
+    dest: "{{ freeipa_ca_cert_path }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when: freeipa_ca_cert_content != ""
+
+- name: Enroll host in FreeIPA realm
+  become: true
+  shell: |
+    ipa-client-install \
+      --server="{{ freeipa_server }}" \
+      --realm="{{ freeipa_realm }}" \
+      --domain="{{ freeipa_domain }}" \
+      --principal="{{ freeipa_enroll_principal }}" \
+      --password="{{ freeipa_enroll_password }}" \
+      --unattended \
+      --force-join
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  register: freeipa_enroll_result
+  failed_when:
+    - freeipa_enroll_result.rc != 0
+    - "'already enrolled' not in freeipa_enroll_result.stderr"
+  changed_when:
+    - freeipa_enroll_result.rc == 0
+
+- name: Verify SSSD is enabled and running
+  become: true
+  systemd:
+    name: sssd
+    state: started
+    enabled: yes
+  register: sssd_status
+
+- name: Restart SSSD to apply configuration
+  become: true
+  systemd:
+    name: sssd
+    state: restarted
+
+- name: Verify FreeIPA enrollment
+  become: true
+  command: id admin
+  register: freeipa_verify
+  failed_when: freeipa_verify.rc != 0
+  changed_when: false

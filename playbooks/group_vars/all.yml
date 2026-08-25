@@ -9,3 +9,13 @@ binary_arch_map:
   aarch64: arm64
 venv_path: "{% if ansible_facts['distribution'] == 'Ubuntu' %}/config/venv/{{ ansible_facts['distribution'] }}_{{ ansible_facts['distribution_version'] }}_{{ ansible_facts['architecture'] }}/oci{% elif
   ansible_facts['distribution'] == 'OracleLinux' %}/config/venv/Ol_{{ ansible_facts['distribution_version'] }}_{{ ansible_facts['architecture'] }}/oci{% endif %}"
+
+# Identity provider configuration (populated from Terraform)
+identity_provider: "{{ identity_provider | default('openldap') }}"
+freeipa_server: "{{ freeipa_server | default('') }}"
+freeipa_realm: "{{ freeipa_realm | default('') }}"
+freeipa_domain: "{{ freeipa_domain | default('') }}"
+freeipa_enroll_principal: "{{ freeipa_enroll_principal | default('') }}"
+freeipa_enroll_password: "{{ freeipa_enroll_password | default('') }}"
+freeipa_ca_cert_content: "{{ freeipa_ca_cert_content | default('') }}"
+

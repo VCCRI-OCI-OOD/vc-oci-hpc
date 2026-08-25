@@ -45,6 +45,33 @@ Template file:
    terraform apply plan.out
    ```
 
+## Identity provider options
+
+### Option 1: Built-in OpenLDAP (default)
+
+Keep `identity_provider = "openldap"` in tfvars. The playbooks will deploy and configure OpenLDAP on the controller.
+
+### Option 2: External FreeIPA (recommended for multi-cluster environments)
+
+Set in tfvars:
+
+```hcl
+identity_provider      = "freeipa"
+ldap                   = false
+freeipa_server         = "ipa.example.com"
+freeipa_realm          = "EXAMPLE.COM"
+freeipa_domain         = "example.com"
+freeipa_enroll_principal = "admin"
+freeipa_enroll_password  = "password"  # or use environment variable in production
+freeipa_ca_cert_content  = "-----BEGIN CERTIFICATE-----..."  # optional, if CA not in system trust
+```
+
+When `identity_provider="freeipa"`:
+- OpenLDAP playbook is skipped
+- Ansible executes FreeIPA host enrollment on the controller
+- SSSD is configured to authenticate against the FreeIPA realm
+- User/group lookups use FreeIPA identity backend
+
 ## Notes
 
 - This is a minimal deployment profile and explicitly disables non-essential components like login, monitoring, compute fleet, and optional storage integrations.

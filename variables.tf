@@ -219,6 +219,55 @@ variable "ldap" {
   default = true
   type    = bool
 }
+
+variable "identity_provider" {
+  default = "openldap"
+  type    = string
+  description = "Identity provider type: 'openldap' (deploy OpenLDAP on controller) or 'freeipa' (join existing FreeIPA realm)"
+  validation {
+    condition     = contains(["openldap", "freeipa"], var.identity_provider)
+    error_message = "identity_provider must be 'openldap' or 'freeipa'."
+  }
+}
+
+variable "freeipa_server" {
+  default = ""
+  type    = string
+  description = "FreeIPA server FQDN (e.g. ipa.example.com). Required if identity_provider='freeipa'."
+}
+
+variable "freeipa_realm" {
+  default = ""
+  type    = string
+  description = "FreeIPA realm name in uppercase (e.g. EXAMPLE.COM). Required if identity_provider='freeipa'."
+}
+
+variable "freeipa_domain" {
+  default = ""
+  type    = string
+  description = "FreeIPA domain (e.g. example.com). Required if identity_provider='freeipa'."
+}
+
+variable "freeipa_enroll_principal" {
+  default = ""
+  type    = string
+  description = "FreeIPA enrollment principal (e.g. admin). Required if identity_provider='freeipa'."
+}
+
+variable "freeipa_enroll_password" {
+  default = ""
+  type    = string
+  sensitive = true
+  description = "FreeIPA enrollment principal password. Use environment variable or secrets vault in production."
+}
+
+variable "freeipa_ca_cert_content" {
+  default = ""
+  type    = string
+  sensitive = true
+  description = "PEM-encoded CA certificate for FreeIPA server TLS validation (optional if CA is in system trust)."
+}
+
 variable "spack" {
   default = false
   type    = bool

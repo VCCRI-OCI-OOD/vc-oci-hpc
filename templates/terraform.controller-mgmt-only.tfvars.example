@@ -28,9 +28,24 @@ controller_username         = "opc"
 # --- Slurm/mgmt enablement ---
 slurm         = true
 slurm_version = "25.11.5-1"
-ldap          = true
 localdisk     = true
 prechecks     = true
+
+# --- Identity provider (openldap or freeipa) ---
+# Choose one:
+# A) Built-in OpenLDAP (default)
+identity_provider = "openldap"
+ldap              = true
+
+# B) External FreeIPA (comment out A, uncomment and populate B)
+# identity_provider        = "freeipa"
+# ldap                     = false
+# freeipa_server           = "ipa.example.com"
+# freeipa_realm            = "EXAMPLE.COM"
+# freeipa_domain           = "example.com"
+# freeipa_enroll_principal = "admin"
+# freeipa_enroll_password  = "password"  # use env var or vault in production
+# freeipa_ca_cert_content  = ""  # optional PEM cert if CA not in system trust
 
 # --- Disable non-minimal components ---
 node_count             = 0
