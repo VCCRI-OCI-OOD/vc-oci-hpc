@@ -90,3 +90,22 @@ stand_alone         = false
 private_deployment  = false
 change_hostname     = false
 hostname_convention = "None"
+
+
+
+# --- Dev Controller Test ---
+
+# --- Ondemand partition configuration (optional) ---
+ondemand_partition       = true
+ondemand_partition_count = 2
+
+instance_pool_shape         = "VM.Standard.E4.Flex"
+instance_pool_ocpus         = 2
+instance_pool_custom_memory = true
+instance_pool_memory        = 16
+boot_volume_size            = 100
+
+stand_alone = true
+
+# --- Using Mode B for existing VCN 
+# --- 
