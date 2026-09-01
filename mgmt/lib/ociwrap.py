@@ -252,7 +252,7 @@ def run_terminate(node):
     try:
         if cluster_type == "SA" or cluster_type == "CC":
             logger.info(f"Terminating node with details {node.hostname}, {node.oci_name}, {node.ip_address}, {node.serial}")
-            CLIENTS.compute_client_composite_operations.terminate_instance_and_wait_for_state(node.ocid,wait_for_states=["TERMINATING","TERMINATED"])
+            CLIENTS.compute_client_composite_operations.update_instance_and_wait_for_state(node.ocid,wait_for_states=["TERMINATING","TERMINATED"])
         elif cluster_type == "IPA" or cluster_type == "CN":
             logger.info(f"Terminating node with details {node.hostname}, {node.oci_name}, {node.ip_address}, {node.serial}")
             instance_details = oci.core.models.DetachInstancePoolInstanceDetails(instance_id=node.ocid,is_auto_terminate=True,is_decrement_size=True)

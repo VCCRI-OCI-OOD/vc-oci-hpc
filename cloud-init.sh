@@ -83,7 +83,7 @@ mkdir -p /config
 
 # Remove stale /config entries before adding the expected mount definition.
 sed -Ei '/^[[:space:]]*[^#[:space:]]+[[:space:]]+\/config([[:space:]]+|$)/d' /etc/fstab
-echo "fss-config:/config /config nfs defaults,nconnect=16 0 0" >> /etc/fstab
+echo "fss-config-2.vc-hpc.local:/config /config nfs defaults,nconnect=16 0 0" >> /etc/fstab
 systemctl daemon-reload
 echo "Configured /config mount in /etc/fstab."
 

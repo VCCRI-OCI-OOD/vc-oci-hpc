@@ -301,10 +301,10 @@ resource "oci_dns_zone" "dns_zone" {
 
 resource "oci_dns_rrset" "config_fss" {
   zone_name_or_id = data.oci_dns_zones.dns_zones.zones[0].id
-  domain          = "fss-config.${local.zone_name}"
+  domain          = "fss-config-2.${local.zone_name}"
   rtype           = "A"
   items {
-    domain = "fss-config.${local.zone_name}"
+    domain = "fss-config-2.${local.zone_name}"
     rtype  = "A"
     rdata  = oci_file_storage_mount_target.config_fss_mount_target.ip_address
     ttl    = 1
