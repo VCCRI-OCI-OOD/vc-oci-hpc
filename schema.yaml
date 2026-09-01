@@ -164,6 +164,18 @@ variableGroups:
       - ${login_memory}
       - ${login_boot_volume_size}
 
+  - title: "Open OnDemand node options"
+    variables:
+      - ${ood_node}
+      - ${ood_ad}
+      - ${ood_shape}
+      - ${ood_ocpus}
+      - ${ood_ocpus_denseIO_flex}
+      - ${ood_ocpus_denseIO_e5_e6_flex}
+      - ${ood_custom_memory}
+      - ${ood_memory}
+      - ${ood_boot_volume_size}
+
   - title: "Cluster Monitoring"
     variables:
       - ${cluster_monitoring}

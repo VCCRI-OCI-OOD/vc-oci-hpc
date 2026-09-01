@@ -91,6 +91,13 @@ data "oci_resourcemanager_private_endpoint_reachable_ip" "private_endpoint_reach
   private_ip          = tostring(oci_core_instance.monitoring[0].private_ip)
 }
 
+data "oci_resourcemanager_private_endpoint_reachable_ip" "private_endpoint_reachable_ip_ood" {
+  #Required
+  count               = (var.private_deployment && var.ood_node) ? 1 : 0
+  private_endpoint_id = oci_resourcemanager_private_endpoint.rms_private_endpoint[0].id
+  private_ip          = tostring(oci_core_instance.ood[0].private_ip)
+}
+
 data "oci_dns_views" "dns_views" {
   depends_on     = [local.controller_subnet, oci_core_vcn.vcn]
   compartment_id = var.vcn_compartment

@@ -1,8 +1,8 @@
 #!/bin/bash
 #
 # First-boot entrypoint for cluster nodes. It reads OCI metadata, mounts the
-# shared /config filesystem, and dispatches to the login, monitoring, or
-# compute bootstrap script.
+# shared /config filesystem, and dispatches to the login, monitoring, Open
+# OnDemand, or compute bootstrap script.
 #
 # Executed on every boot/cloud-init run:
 # - detect the OS and default user
@@ -12,6 +12,7 @@
 # Role-specific bootstrap execution (in order):
 # - login nodes run /config/bin/login.sh
 # - monitoring nodes run /config/bin/monitoring.sh
+# - Open OnDemand nodes run /config/bin/ood.sh
 # - non-controller compute nodes run /config/bin/compute.sh
 source /etc/os-release
 
@@ -33,6 +34,7 @@ cluster_name=$(get_freeform_tag cluster_name)
 config_fss_hostname=$(get_freeform_tag config_fss_hostname)
 login=$(get_freeform_tag login)
 monitoring=$(get_freeform_tag monitoring)
+ood=$(get_freeform_tag ood)
 controller=$(get_freeform_tag controller)
 
 if [ -z "$cluster_name" ] && [ -n "$controller_name" ]; then
@@ -56,6 +58,8 @@ if [ "$login" == "true" ]; then
     role_script="/config/bin/login.sh"
 elif [ "$monitoring" == "true" ]; then
     role_script="/config/bin/monitoring.sh"
+elif [ "$ood" == "true" ]; then
+    role_script="/config/bin/ood.sh"
 elif [ "$controller" != "true" ] ; then
     role_script="/config/bin/compute.sh"
 fi

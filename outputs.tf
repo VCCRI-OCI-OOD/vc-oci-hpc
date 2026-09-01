@@ -22,6 +22,14 @@ output "monitoring" {
   value = var.monitoring_node ? local.host_monitoring : "No Monitoring Node Defined"
 }
 
+output "ood" {
+  value = var.ood_node ? local.host_ood : "No Open OnDemand Node Defined"
+}
+
+output "ood_url" {
+  value = var.ood_node ? "https://${local.host_ood}" : "N/A"
+}
+
 output "grafana_password" {
   value     = random_password.grafana_admin_pwd.result
   sensitive = true

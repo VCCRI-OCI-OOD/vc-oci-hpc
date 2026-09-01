@@ -223,6 +223,22 @@ variable "monitoring_boot_volume_size" {
   default = 50
   type    = number
 }
+variable "ood_node" {
+  default = false
+  type    = bool
+}
+variable "ood_ad" {
+  default = ""
+  type    = string
+}
+variable "ood_shape" {
+  default = "VM.Standard2.4"
+  type    = string
+}
+variable "ood_boot_volume_size" {
+  default = 50
+  type    = number
+}
 variable "ldap" {
   default = true
   type    = bool
@@ -336,6 +352,18 @@ variable "monitoring_ocpus_denseIO_e5_e6_flex" {
   default = 8
   type    = number
 }
+variable "ood_ocpus" {
+  default = 2
+  type    = number
+}
+variable "ood_ocpus_denseIO_flex" {
+  default = 8
+  type    = number
+}
+variable "ood_ocpus_denseIO_e5_e6_flex" {
+  default = 8
+  type    = number
+}
 variable "controller_memory" {
   default = 16
   type    = number
@@ -357,6 +385,14 @@ variable "monitoring_memory" {
   type    = number
 }
 variable "monitoring_custom_memory" {
+  default = false
+  type    = bool
+}
+variable "ood_memory" {
+  default = 16
+  type    = number
+}
+variable "ood_custom_memory" {
   default = false
   type    = bool
 }

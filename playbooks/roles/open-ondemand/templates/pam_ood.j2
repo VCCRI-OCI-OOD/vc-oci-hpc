@@ -1,0 +1,4 @@
+#%PAM-1.0
+# Portal login delegates to the sssd-backed system auth stack configured by the sssd role.
+auth       include      system-auth
+account    include      system-auth

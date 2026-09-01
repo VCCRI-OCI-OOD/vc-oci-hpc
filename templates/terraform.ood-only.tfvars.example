@@ -1,0 +1,101 @@
+# =========================
+# Minimal OCI tfvars template
+# Slurm controller + Open OnDemand portal only
+# =========================
+
+# --- Required core OCI inputs ---
+region            = "ap-sydney-1"
+tenancy_ocid      = "ocid1.tenancy.oc1..REPLACE_ME"
+targetCompartment = "ocid1.compartment.oc1..REPLACE_ME"
+ad                = "1"
+controller_ad     = "1"
+
+# SSH public key content (single line)
+ssh_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ... yourkey"
+
+# --- Cluster identity ---
+use_custom_name = true
+cluster_name    = "slurm-ood-minimal"
+
+# --- Controller (always required, hosts the /config share and scheduler) ---
+controller_shape            = "VM.Standard.E4.Flex"
+controller_ocpus            = 2
+controller_memory           = 16
+controller_custom_memory    = true
+controller_boot_volume_size = 100
+controller_username         = "opc"
+
+# --- Open OnDemand node (the only optional node enabled here) ---
+ood_node             = true
+ood_ad               = "1"
+ood_shape            = "VM.Standard.E4.Flex"
+ood_ocpus            = 2
+ood_memory           = 16
+ood_custom_memory    = true
+ood_boot_volume_size = 100
+
+# --- Slurm/mgmt enablement ---
+slurm         = true
+slurm_version = "25.11.5-1"
+localdisk     = true
+prechecks     = true
+
+# --- Identity provider (openldap or freeipa) ---
+# Choose one:
+# A) Built-in OpenLDAP (default)
+identity_provider = "openldap"
+ldap              = true
+
+# B) External FreeIPA (comment out A, uncomment and populate B)
+# identity_provider        = "freeipa"
+# ldap                     = false
+# freeipa_server           = "ipa.example.com"
+# freeipa_realm            = "EXAMPLE.COM"
+# freeipa_domain           = "example.com"
+# freeipa_enroll_principal = "admin"
+# freeipa_enroll_password  = "password"  # use env var or vault in production
+# freeipa_ca_cert_content  = ""  # optional PEM cert if CA not in system trust
+
+# --- Disable non-minimal components ---
+node_count             = 0
+login_node             = false
+monitoring_node        = false
+cluster_monitoring     = false
+alerting               = false
+spack                  = false
+enroot                 = false
+pyxis                  = false
+add_nfs                = false
+add_lfs                = false
+create_bucket          = false
+ondemand_partition     = false
+slurm_ha               = false
+slurm_federation       = false
+compute_cluster_exists = false
+rdma_enabled           = false
+
+# --- Image selection (recommended marketplace path) ---
+use_marketplace_image            = true
+use_marketplace_image_controller = true
+marketplace_listing_controller   = "HPC_OL8"
+
+# --- Networking (choose one mode) ---
+# Mode A: create new VCN
+use_existing_vcn = false
+vcn_subnet       = "172.16.0.0/21"
+public_subnet    = "172.16.0.0/24"
+private_subnet   = "172.16.4.0/22"
+rdma_subnet      = "192.168.0.0/16"
+ssh_cidr         = "0.0.0.0/0"
+
+# Mode B: use existing VCN (uncomment and set these, then set use_existing_vcn=true)
+# use_existing_vcn = true
+# vcn_id            = "ocid1.vcn.oc1..REPLACE_ME"
+# public_subnet_id  = "ocid1.subnet.oc1..REPLACE_ME"
+# private_subnet_id = "ocid1.subnet.oc1..REPLACE_ME"
+
+# --- Keep defaults/simple behavior ---
+stand_alone         = true
+private_deployment  = false
+change_hostname     = false
+hostname_convention = "None"
