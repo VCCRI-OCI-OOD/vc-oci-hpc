@@ -1,0 +1,9 @@
+---
+- name: Regenerate ood portal apache config
+  ansible.builtin.command: /opt/ood/ood-portal-generator/sbin/update_ood_portal
+  notify: Restart ood web service
+
+- name: Restart ood web service
+  ansible.builtin.systemd:
+    name: "{{ ood_web_service }}"
+    state: restarted

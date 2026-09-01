@@ -1,0 +1,11 @@
+---
+v2:
+  metadata:
+    title: "{{ cluster_name }}"
+  login:
+    host: "{{ controller_hostname }}"
+  job:
+    adapter: "slurm"
+    cluster: "{{ cluster_name }}"
+    bin: "{{ ood_slurm_bin_dir }}"
+    conf: "{{ ood_slurm_conf_path }}/slurm.conf"

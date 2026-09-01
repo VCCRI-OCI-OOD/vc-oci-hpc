@@ -1,0 +1,46 @@
+---
+- name: Install and configure Open OnDemand on Oracle Linux / RHEL-family
+  ansible.builtin.include_tasks: el.yml
+  when: ansible_facts['os_family'] == 'RedHat'
+
+- name: Install and configure Open OnDemand on Ubuntu
+  ansible.builtin.include_tasks: ubuntu.yml
+  when: ansible_facts['distribution'] == 'Ubuntu'
+
+- name: Generate the self-signed TLS certificate for the portal vhost
+  ansible.builtin.include_tasks: selfsigned_cert.yml
+
+- name: Render the Slurm cluster adapter configuration
+  ansible.builtin.template:
+    src: cluster.yml.j2
+    dest: "/etc/ood/config/clusters.d/{{ cluster_name }}.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  when: slurm | default(false) | bool
+
+- name: Render the portal configuration
+  ansible.builtin.template:
+    src: ood_portal.yml.j2
+    dest: /etc/ood/config/ood_portal.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Regenerate ood portal apache config
+
+- name: Configure the PAM service used for portal authentication
+  ansible.builtin.template:
+    src: pam_ood.j2
+    dest: "/etc/pam.d/{{ ood_pam_service }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Flush handlers so the portal is served with the rendered configuration
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure the web server is enabled and running
+  ansible.builtin.systemd:
+    name: "{{ ood_web_service }}"
+    enabled: true
+    state: started

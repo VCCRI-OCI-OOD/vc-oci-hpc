@@ -1,0 +1,13 @@
+---
+servername: "{{ ood_servername }}"
+port: 443
+ssl: true
+security_csp_enabled: false
+ssl_options:
+  - 'SSLCertificateFile "{{ ood_ssl_cert_dir }}/{{ ood_servername }}.crt"'
+  - 'SSLCertificateKeyFile "{{ ood_ssl_key_dir }}/{{ ood_servername }}.key"'
+auth:
+  - 'AuthType basic'
+  - 'AuthBasicProvider PAM'
+  - 'AuthPAMService {{ ood_pam_service }}'
+  - 'Require valid-user'

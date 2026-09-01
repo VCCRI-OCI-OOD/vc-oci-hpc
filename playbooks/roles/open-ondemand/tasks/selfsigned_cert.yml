@@ -1,0 +1,21 @@
+---
+- name: Ensure the TLS key directory exists
+  ansible.builtin.file:
+    path: "{{ ood_ssl_key_dir }}"
+    state: directory
+    mode: "0750"
+
+- name: Generate a self-signed certificate for the portal vhost
+  ansible.builtin.command: >
+    openssl req -newkey rsa:4096 -nodes -sha512 -x509
+      -days {{ ood_ssl_cert_days }}
+      -subj "/CN={{ ood_servername }}"
+      -keyout "{{ ood_ssl_key_dir }}/{{ ood_servername }}.key"
+      -out "{{ ood_ssl_cert_dir }}/{{ ood_servername }}.crt"
+  args:
+    creates: "{{ ood_ssl_cert_dir }}/{{ ood_servername }}.crt"
+
+- name: Restrict permissions on the portal private key
+  ansible.builtin.file:
+    path: "{{ ood_ssl_key_dir }}/{{ ood_servername }}.key"
+    mode: "0640"

@@ -38,6 +38,7 @@ locals {
   controller_ocpus    = var.controller_shape == "VM.DenseIO.E4.Flex" ? var.controller_ocpus_denseIO_flex : (var.controller_shape == "VM.DenseIO.E5.Flex" || var.controller_shape == "VM.DenseIO.E6.Ax.Flex") ? var.controller_ocpus_denseIO_e5_e6_flex : var.controller_ocpus
   login_ocpus         = var.login_shape == "VM.DenseIO.E4.Flex" ? var.login_ocpus_denseIO_flex : (var.login_shape == "VM.DenseIO.E5.Flex" || var.login_shape == "VM.DenseIO.E6.Ax.Flex") ? var.login_ocpus_denseIO_e5_e6_flex : var.login_ocpus
   monitoring_ocpus    = var.monitoring_shape == "VM.DenseIO.E4.Flex" ? var.monitoring_ocpus_denseIO_flex : (var.monitoring_shape == "VM.DenseIO.E5.Flex" || var.monitoring_shape == "VM.DenseIO.E6.Ax.Flex") ? var.monitoring_ocpus_denseIO_e5_e6_flex : var.monitoring_ocpus
+  ood_ocpus           = var.ood_shape == "VM.DenseIO.E4.Flex" ? var.ood_ocpus_denseIO_flex : (var.ood_shape == "VM.DenseIO.E5.Flex" || var.ood_shape == "VM.DenseIO.E6.Ax.Flex") ? var.ood_ocpus_denseIO_e5_e6_flex : var.ood_ocpus
   // ips of the instances
   cluster_instances_ips       = var.stand_alone ? var.rdma_enabled ? oci_core_instance.compute_cluster_instances.*.private_ip : oci_core_instance.compute_instances.*.private_ip : var.rdma_enabled ? data.oci_core_instance.cluster_network_instances.*.private_ip : data.oci_core_instance.instance_pool_instances.*.private_ip
   first_vcn_ip                = cidrhost(data.oci_core_subnet.private_subnet.cidr_block, 0)
@@ -78,6 +79,7 @@ locals {
   is_controller_flex_shape = length(regexall(".*VM.*.*(Flex|Generic)$", var.controller_shape)) > 0 ? [local.controller_ocpus] : []
   is_login_flex_shape      = length(regexall(".*VM.*.*(Flex|Generic)$", var.login_shape)) > 0 ? [local.login_ocpus] : []
   is_monitoring_flex_shape = length(regexall(".*VM.*.*(Flex|Generic)$", var.monitoring_shape)) > 0 ? [local.monitoring_ocpus] : []
+  is_ood_flex_shape        = length(regexall(".*VM.*.*(Flex|Generic)$", var.ood_shape)) > 0 ? [local.ood_ocpus] : []
 
   is_instance_pool_flex_shape = length(regexall(".*VM.*.*(Flex|Generic)$", var.instance_pool_shape)) > 0 ? [local.instance_pool_ocpus] : []
 
@@ -88,11 +90,13 @@ locals {
   controller_bool_ip  = var.private_deployment ? false : true
   login_bool_ip       = var.private_deployment ? false : true
   monitoring_bool_ip  = var.private_deployment ? false : true
+  ood_bool_ip         = var.private_deployment ? false : true
   controller_subnet   = var.private_deployment ? oci_core_subnet.private-subnet : oci_core_subnet.public-subnet
   private_subnet_cidr = var.private_deployment ? [var.public_subnet, var.private_subnet] : [var.private_subnet]
   host_backup         = var.slurm_ha ? var.private_deployment ? data.oci_resourcemanager_private_endpoint_reachable_ip.private_endpoint_reachable_ip_backup[0].ip_address : oci_core_instance.backup[0].public_ip : "none"
   host_login          = var.login_node ? var.private_deployment ? data.oci_resourcemanager_private_endpoint_reachable_ip.private_endpoint_reachable_ip_login[0].ip_address : oci_core_instance.login[0].public_ip : "none"
   host_monitoring     = var.monitoring_node ? var.private_deployment ? data.oci_resourcemanager_private_endpoint_reachable_ip.private_endpoint_reachable_ip_monitoring[0].ip_address : oci_core_instance.monitoring[0].public_ip : "none"
+  host_ood            = var.ood_node ? var.private_deployment ? data.oci_resourcemanager_private_endpoint_reachable_ip.private_endpoint_reachable_ip_ood[0].ip_address : oci_core_instance.ood[0].public_ip : "none"
 
   timeout_per_batch = var.rdma_enabled ? 30 : 15
   timeout_ip        = join("", [((var.node_count - (var.node_count % 20)) / 20 + 1) * local.timeout_per_batch, "m"])

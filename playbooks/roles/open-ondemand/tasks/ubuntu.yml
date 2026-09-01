@@ -1,0 +1,46 @@
+---
+- name: Set the web service name for Ubuntu
+  ansible.builtin.set_fact:
+    ood_web_service: apache2
+    ood_ssl_cert_dir: "{{ ood_ssl_cert_dir_ubuntu }}"
+    ood_ssl_key_dir: "{{ ood_ssl_key_dir_ubuntu }}"
+
+- name: Ensure apt-transport-https is installed
+  vars:
+    package_name:
+      - apt-transport-https
+      - gnupg
+    package_state: present
+  ansible.builtin.include_role:
+    name: safe_yum
+
+- name: Ensure the apt keyrings directory exists
+  ansible.builtin.file:
+    path: /usr/share/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Fetch and de-armor the Open OnDemand repo signing key
+  ansible.builtin.shell: |
+    set -o pipefail
+    curl -fsSL {{ ood_ubuntu_repo_gpg_url }} | gpg --dearmor > /usr/share/keyrings/ondemand.gpg
+  args:
+    executable: /bin/bash
+    creates: /usr/share/keyrings/ondemand.gpg
+
+- name: Add the Open OnDemand apt repo
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/ondemand.gpg] {{ ood_ubuntu_repo_base_url }} {{ ansible_facts['distribution_release'] }} main"
+    filename: ondemand
+    state: present
+    update_cache: true
+
+- name: Install Open OnDemand and PAM auth modules
+  vars:
+    package_name:
+      - ondemand
+      - libapache2-mod-authnz-pam
+      - ssl-cert
+    package_state: present
+  ansible.builtin.include_role:
+    name: safe_yum

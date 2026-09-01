@@ -1,0 +1,22 @@
+---
+- name: Set the web service name for Oracle Linux / RHEL-family
+  ansible.builtin.set_fact:
+    ood_web_service: httpd
+    ood_ssl_cert_dir: "{{ ood_ssl_cert_dir_el }}"
+    ood_ssl_key_dir: "{{ ood_ssl_key_dir_el }}"
+
+- name: Install the Open OnDemand release repo
+  ansible.builtin.dnf:
+    name: "{{ ood_el_release_rpm_url }}"
+    state: present
+    disable_gpg_check: true
+
+- name: Install Open OnDemand and PAM auth modules
+  vars:
+    package_name:
+      - ondemand
+      - mod_authnz_pam
+      - mod_ssl
+    package_state: present
+  ansible.builtin.include_role:
+    name: safe_yum
