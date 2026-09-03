@@ -23,6 +23,25 @@ else
     default_user=opc
 fi
 
+# HBAC registration for IPA client on Debian/Ubuntu systems.
+if [ "$ID" == "debian" ] || [ "$ID" == "ubuntu" ] ; then
+    export DEBIAN_FRONTEND=noninteractive
+    sleep 10
+    ln -sfv /run/systemd/resolve/resolv.conf /etc/resolv.conf
+    sleep 10
+    apt update -y
+    sleep 30
+    apt install freeipa-client -y
+    sleep 10
+    IP=$(hostname -I)
+    HOSTNAME=$(hostname)
+    FQDN=$(host $IP | awk '{print $NF}' | sed 's/\.$//')
+
+    sed -i "1s/^/127.0.0.1\t$FQDN\t$HOSTNAME\n/" /etc/hosts
+    sleep 10
+    ipa-client-install -U --domain=ood.local --server=ipa.ood.local --realm=OOD.LOCAL --force --force-join --principal=admin --password=@@@
+fi
+
 function get_freeform_tag {
     local tag_name="$1"
     curl -fsL --retry 5 --retry-delay 2 -H "Authorization: Bearer Oracle" "http://169.254.169.254/opc/v2/instance/freeformTags/${tag_name}" 2>/dev/null || true

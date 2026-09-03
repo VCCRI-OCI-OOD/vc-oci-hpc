@@ -45,39 +45,6 @@
     path: /opt/oci-hpc/healthchecks/gpu_reset.sh
     mode: '0755'
 
-<<<<<<< HEAD
-# - name: Download oci-mesh-pinger
-#   environment: "{{ {'SSL_CERT_FILE': '/etc/pki/tls/certs/ca-bundle.crt', 'REQUESTS_CA_BUNDLE': '/etc/pki/tls/certs/ca-bundle.crt'} if ansible_facts['distribution'] == 'OracleLinux' else {} }}"
-#   ansible.builtin.get_url:
-#     url: "{{ mp_download_link_x86 }}"
-#     dest: "/tmp/{{ mp_filename }}"
-#   when: ('controller' in group_names) and ansible_facts['architecture'] == "x86_64"
-
-# - name: Download oci-mesh-pinger
-#   ansible.builtin.get_url:
-#     url: "{{ mp_download_link_arm }}"
-#     dest: "/tmp/{{ mp_filename }}"
-#   when: ('controller' in group_names) and ansible_facts['architecture'] == "aarch64" and ansible_facts['distribution_major_version'] != "8"
-
-# - name: Untar meshpinger
-#   ansible.builtin.unarchive:
-#     src: "/tmp/{{ mp_filename }}"
-#     dest: "/opt/oci-hpc/healthchecks"
-#   when: ('controller' in group_names)
-
-# - name: Copy files
-#   become: true
-#   ansible.builtin.copy:
-#     src: "{{ item }}"
-#     dest: "/opt/oci-hpc/healthchecks/{{ item }}"
-#     force: false
-#     owner: "{{ ansible_user }}"
-#     group: "{{ ansible_user }}"
-#     mode: "0755"
-#   with_items:
-#     - run_meshpinger.sh
-#   when: ('controller' in group_names)
-=======
 - name: Ensure GPU fryer Docker image cache directory exists
   become: true
   ansible.builtin.file:
@@ -137,8 +104,6 @@
     - "'BM.GPU.MI' not in (shape | default(''))"
     - not (healthchecks_gpu_fryer_cache_tar_stat.stat.exists | default(false))
     - healthchecks_gpu_fryer_docker_info.rc | default(1) == 0
->>>>>>> master
-
 
 - name: Make sure healthcheck dependencies are installed.
   vars:

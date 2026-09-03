@@ -73,6 +73,9 @@
         name: hyperthreading
       when: not hyperthreading | default(true) | bool
 
+
+## NFS client configuration for shared home directories. This needs to be modified per cluster config 
+## FSS share would not be controller-hosted, so need to update the export_host accordingly
 - name: Configure NFS
   hosts: localhost
   become: true

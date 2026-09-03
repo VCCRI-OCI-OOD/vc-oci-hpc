@@ -31,6 +31,9 @@
     - ansible.builtin.include_role:
         name: clean_tmp
 
+
+## NFS client configuration for shared home directories. This needs to be modified per cluster config 
+## FSS share would not be controller-hosted, so need to update the export_host accordingly
 - hosts: localhost
   become: true
   tasks:
