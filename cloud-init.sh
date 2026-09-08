@@ -113,11 +113,12 @@ function bootstrap_files_ready {
 }
 
 # Configure the shared NFS mount used to fetch role-specific bootstrap scripts.
-mkdir -p /config
+mkdir -p /config /lustre /juicefs
 
 # Remove stale /config entries before adding the expected mount definition.
 sed -Ei '/^[[:space:]]*[^#[:space:]]+[[:space:]]+\/config([[:space:]]+|$)/d' /etc/fstab
 echo "${config_fss_hostname}:/config /config nfs defaults,nconnect=16 0 0" >> /etc/fstab
+echo "172.16.7.172@tcp:/lustrefs /lustre lustre defaults,_netdev,flock 0 0" >> /etc/fstab
 systemctl daemon-reload
 echo "Configured /config mount in /etc/fstab."
 
@@ -131,6 +132,22 @@ while true; do
             continue
         fi
     fi
+    if ! mountpoint -q /lustre; then
+        echo "Attempting to mount /lustre"
+        if ! mount /lustre; then
+            echo "Mount failed. Retrying in 15s..."
+            sleep 15
+            continue
+        fi
+    fi
+    if ! mountpoint -q /juicefs; then
+        echo "Attempting to mount /juicefs"
+        if ! mount /juicefs; then
+            echo "Mount failed. Retrying in 15s..."
+            sleep 15
+            continue
+        fi
+    fi  
 
     echo "/config is mounted. Checking if bootstrap files are present"
     if bootstrap_files_ready; then
