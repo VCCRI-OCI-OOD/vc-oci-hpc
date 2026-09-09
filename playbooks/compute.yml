@@ -113,10 +113,16 @@
   hosts: localhost
   become: true
   tasks:
-    - name: Set up the Systems Security Services Demon
+    - name: Set up SSSD for OpenLDAP
       ansible.builtin.include_role:
         name: sssd
-      when: ldap | default(true) | bool
+      when:
+        - (identity_provider | default("openldap")) == "openldap"
+        - ldap | default(true) | bool
+    - name: Set up SSSD for FreeIPA
+      ansible.builtin.include_role:
+        name: freeipa-client
+      when: (identity_provider | default("openldap")) == "freeipa"
 
 - name: Configure container setup
   hosts: localhost

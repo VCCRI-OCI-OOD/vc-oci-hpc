@@ -111,7 +111,9 @@
   tasks:
     - ansible.builtin.include_role:
         name: sssd
-      when: ldap | default(true) | bool
+      when:
+        - (identity_provider | default("openldap")) == "openldap"
+        - ldap | default(true) | bool
 
 - hosts: controller, slurm_backup
   become: true
