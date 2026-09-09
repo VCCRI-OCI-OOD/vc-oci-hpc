@@ -12,9 +12,22 @@ uv pip install \
   --requirement function/requirements.txt \
   --requirement scripts/collect_metadata/requirements.txt
 
+first_line() {
+  local output
+  output="$($@)"
+  printf '%s\n' "${output%%$'\n'*}"
+}
+
 printf '\nDevelopment tools installed:\n'
-terraform version | head -n 1
-tflint --version | head -n 1
+first_line terraform version
+first_line tflint --version
 oci --version
-ansible --version | head -n 1
+# Devcontainer image may expose ansible as ansible-community.
+if command -v ansible >/dev/null 2>&1; then
+  first_line ansible --version
+elif command -v ansible-community >/dev/null 2>&1; then
+  first_line ansible-community --version
+else
+  printf 'ansible: not found in PATH\n'
+fi
 uv --version
