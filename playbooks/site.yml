@@ -76,16 +76,13 @@
   tasks:
     - ansible.builtin.include_role:
         name: ssl
-      when: (identity_provider | default("openldap")) == "openldap" and (ldap | default(true) | bool)
+      when: identity_openldap_enabled | bool
     - ansible.builtin.include_role:
         name: openldap
-      when: (identity_provider | default("openldap")) == "openldap" and (ldap | default(true) | bool)
+      when: identity_openldap_enabled | bool
     - ansible.builtin.include_role:
         name: cluster-cli
-      when: (identity_provider | default("openldap")) == "openldap" and (ldap | default(true) | bool)
-    - ansible.builtin.include_role:
-        name: freeipa-client
-      when: (identity_provider | default("openldap")) == "freeipa"
+      when: identity_openldap_enabled | bool
 
 - hosts: controller
   become: true
@@ -109,18 +106,15 @@
 - hosts: controller, slurm_backup
   become: true
   tasks:
-    - ansible.builtin.include_role:
-        name: sssd
-      when:
-        - (identity_provider | default("openldap")) == "openldap"
-        - ldap | default(true) | bool
+    - name: Configure the identity client
+      ansible.builtin.import_tasks: tasks/identity_client.yml
 
 - hosts: controller, slurm_backup
   become: true
   tasks:
     - ansible.builtin.include_role:
         name: fix_ldap
-      when: ldap | default(true) | bool
+      when: identity_openldap_enabled | bool
 
 - hosts: controller, slurm_backup
   vars:

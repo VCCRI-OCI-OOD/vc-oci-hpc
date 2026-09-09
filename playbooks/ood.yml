@@ -57,9 +57,8 @@
 - hosts: localhost
   become: true
   tasks:
-    - ansible.builtin.include_role:
-        name: sssd
-      when: ldap | default(true) | bool
+    - name: Configure the identity client
+      ansible.builtin.import_tasks: tasks/identity_client.yml
 
 - hosts: localhost
   become: true

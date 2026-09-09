@@ -9,6 +9,7 @@ The following section guides users through stack deployment and usage.
 * [Userguide.md](/documentation/Userguide.md): how to use the cluster.
 * [Slurm-Partition-Runbook.md](/documentation/Slurm-Partition-Runbook.md): Create a new Slurm partition and add GPU nodes.
 * [Slurm-Troubleshooting-Runbook.md](/documentation/Slurm-Troubleshooting-Runbook.md): Diagnose and resolve common Slurm job, node, topology, controller, and accounting issues.
+* [Identity-Provider-Runbook.md](/documentation/Identity-Provider-Runbook.md): Select, deploy, and migrate the cluster identity backend (FreeIPA or OpenLDAP).
 * [Healthcheck-NCCL-Runbook.md](/documentation/Healthcheck-NCCL-Runbook.md): Run passive, active, and multi-node NCCL healthchecks.
 * [LocaldiskRecovery.md](/documentation/LocaldiskRecovery.md): Recover and manage local NVMe storage.
 * [Background.md](/documentation/Background.md): technical information on the infrastructure.

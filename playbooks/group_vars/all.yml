@@ -13,7 +13,10 @@ venv_path: "{% if ansible_facts['distribution'] == 'Ubuntu' %}/config/venv/{{ an
 # Identity provider configuration (populated from Terraform)
 # Keep plain defaults here so the inventory can override them without creating
 # a Jinja self-reference loop.
-identity_provider: "openldap"
+identity_provider: "freeipa"
+# Convenience flags consumed by tasks/identity_client.yml and the OpenLDAP roles.
+identity_freeipa_enabled: "{{ identity_provider == 'freeipa' }}"
+identity_openldap_enabled: "{{ identity_provider == 'openldap' and (ldap | default(true) | bool) }}"
 freeipa_server: ""
 freeipa_realm: ""
 freeipa_domain: ""
