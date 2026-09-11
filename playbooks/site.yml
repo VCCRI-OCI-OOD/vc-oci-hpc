@@ -76,16 +76,16 @@
   tasks:
     - ansible.builtin.include_role:
         name: ssl
-      when: (identity_provider | default("openldap")) == "openldap" and (ldap | default(true) | bool)
+      when: identity_provider == "openldap" and (ldap | default(true) | bool)
     - ansible.builtin.include_role:
         name: openldap
-      when: (identity_provider | default("openldap")) == "openldap" and (ldap | default(true) | bool)
+      when: identity_provider == "openldap" and (ldap | default(true) | bool)
     - ansible.builtin.include_role:
         name: cluster-cli
-      when: (identity_provider | default("openldap")) == "openldap" and (ldap | default(true) | bool)
+      when: identity_provider == "openldap" and (ldap | default(true) | bool)
     - ansible.builtin.include_role:
         name: freeipa-client
-      when: (identity_provider | default("openldap")) == "freeipa"
+      when: identity_provider == "freeipa"
 
 - hosts: controller
   become: true

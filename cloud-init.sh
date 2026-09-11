@@ -29,17 +29,11 @@ if [ "$ID" == "debian" ] || [ "$ID" == "ubuntu" ] ; then
     sleep 10
     ln -sfv /run/systemd/resolve/resolv.conf /etc/resolv.conf
     sleep 10
-    apt update -y
-    sleep 30
-    apt install freeipa-client -y
-    sleep 10
     IP=$(hostname -I)
     HOSTNAME=$(hostname)
     FQDN=$(host $IP | awk '{print $NF}' | sed 's/\.$//')
 
     sed -i "1s/^/127.0.0.1\t$FQDN\t$HOSTNAME\n/" /etc/hosts
-    sleep 10
-    ipa-client-install -U --domain=ood.local --server=ipa.ood.local --realm=OOD.LOCAL --force --force-join --principal=admin --password=@@@
 fi
 
 function get_freeform_tag {
@@ -113,12 +107,11 @@ function bootstrap_files_ready {
 }
 
 # Configure the shared NFS mount used to fetch role-specific bootstrap scripts.
-mkdir -p /config /lustre /juicefs
+mkdir -p /config /lustre /juicefs /var/oled/jfs_cache /apps /scratch
 
 # Remove stale /config entries before adding the expected mount definition.
 sed -Ei '/^[[:space:]]*[^#[:space:]]+[[:space:]]+\/config([[:space:]]+|$)/d' /etc/fstab
 echo "${config_fss_hostname}:/config /config nfs defaults,nconnect=16 0 0" >> /etc/fstab
-echo "172.16.7.172@tcp:/lustrefs /lustre lustre defaults,_netdev,flock 0 0" >> /etc/fstab
 systemctl daemon-reload
 echo "Configured /config mount in /etc/fstab."
 
@@ -132,22 +125,6 @@ while true; do
             continue
         fi
     fi
-    if ! mountpoint -q /lustre; then
-        echo "Attempting to mount /lustre"
-        if ! mount /lustre; then
-            echo "Mount failed. Retrying in 15s..."
-            sleep 15
-            continue
-        fi
-    fi
-    if ! mountpoint -q /juicefs; then
-        echo "Attempting to mount /juicefs"
-        if ! mount /juicefs; then
-            echo "Mount failed. Retrying in 15s..."
-            sleep 15
-            continue
-        fi
-    fi  
 
     echo "/config is mounted. Checking if bootstrap files are present"
     if bootstrap_files_ready; then

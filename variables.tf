@@ -245,7 +245,7 @@ variable "ldap" {
 }
 
 variable "identity_provider" {
-  default = "openldap"
+  default = "freeipa"
   type    = string
   description = "Identity provider type: 'openldap' (deploy OpenLDAP on controller) or 'freeipa' (join existing FreeIPA realm)"
   validation {
@@ -435,6 +435,10 @@ variable "shared_home" {
   default = "nfs"
   type    = string
 }
+variable "home_nfs_target_ip" {
+  default = ""
+  type    = string
+}
 variable "create_bucket" {
   default = false
   type    = bool
@@ -443,9 +447,29 @@ variable "hyperthreading" {
   default = true
   type    = bool
 }
+variable "add_juicefs" {
+  default = false
+  type    = bool
+}
 variable "add_nfs" {
   default = false
   type    = bool
+}
+variable "add_apps_nfs" {
+  default = false
+  type    = bool
+}
+variable "apps_nfs_source_IP" {
+  default = ""
+  type    = string
+}
+variable "add_scratch_nfs" {
+  default = false
+  type    = bool
+}
+variable "scratch_nfs_source_IP" {
+  default = ""
+  type    = string
 }
 variable "create_fss" {
   default = "existing"

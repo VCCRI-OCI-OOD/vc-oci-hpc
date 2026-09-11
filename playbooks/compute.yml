@@ -111,15 +111,79 @@
         options: "{{ nfs_options }}"
         lock: "none"
       when: add_nfs | default(false) | bool
+    - name: Create Apps directory
+      ansible.builtin.file:
+        name: "/apps"
+        state: directory
+        owner: "{{ cluster_admin_user }}"
+        group: "{{ cluster_admin_user }}"
+        mode: "0755"
+      when: add_apps_nfs | default(false) | bool
+    - name: Configure Apps directories via NFS
+      ansible.builtin.include_role:
+        name: nfs-client
+      vars:
+        local_path: "/apps"
+        export_host: "{{ apps_nfs_source_IP }}"
+        export_path: "/apps"
+        options: "vers=3,rsize=1048576,wsize=1048576,hard,noatime,nofail,_netdev"
+        lock: "all"
+      when: add_apps_nfs | default(false) | bool
+    - name: Create Scratch directory
+      ansible.builtin.file:
+        name: "/scratch"
+        state: directory
+        owner: "{{ cluster_admin_user }}"
+        group: "{{ cluster_admin_user }}"
+        mode: "0755"
+      when: add_scratch_nfs | default(false) | bool
+    - name: Configure Scratch directories via NFS
+      ansible.builtin.include_role:
+        name: nfs-client
+      vars:
+        local_path: "/scratch"
+        export_host: "{{ scratch_nfs_source_IP }}"
+        export_path: "/scratch"
+        options: "vers=3,rsize=1048576,wsize=1048576,hard,noatime,nofail,_netdev"
+        lock: "all"
+      when: add_scratch_nfs | default(false) | bool
 
-- name: Set up sssd
+- name: Set up Juicefs Service
   hosts: localhost
   become: true
   tasks:
-    - name: Set up the Systems Security Services Demon
+    - name: Install and configure Docker
       ansible.builtin.include_role:
-        name: sssd
-      when: ldap | default(true) | bool
+        name: juicefs
+      when: add_juicefs | default(false) | bool
+
+- name: Set up the identity client
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Configure the identity client
+      ansible.builtin.import_tasks: tasks/identity_client.yml
+
+- name: Configure Lustre
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Ensure Lustre directory exist
+      ansible.builtin.file:
+        name: "/lustre"
+        state: directory
+        owner: "{{ cluster_admin_user }}"
+        group: "{{ cluster_admin_user }}"
+        mode: "0755"
+      when: add_lfs | default(false) | bool
+    - name: Mount Lustre Share
+      ansible.posix.mount:
+        path: "{{ lfs_target_path }}"
+        src: "{{ lfs_source_IP }}@tcp:/{{ lfs_source_path }}"
+        opts: "{{ lfs_options | default('defaults,_netdev', true) }}"
+        fstype: lustre
+        state: mounted
+      when: add_lfs | default(false) | bool
 
 - name: Configure container setup
   hosts: localhost
@@ -169,27 +233,6 @@
       ansible.builtin.include_role:
         name: imex
       when: "'GPU.GB' in shape"
-
-- name: Configure Lustre
-  hosts: localhost
-  pre_tasks:
-    - name: Prepare shared 3rdparty paths
-      ansible.builtin.import_tasks: tasks/prepare_thirdparty_paths.yml
-  tasks:
-    - name: Add lustre-client when LFS is added to the cluster
-      ansible.builtin.include_role:
-        name: lustre_client
-        apply:
-          environment:
-            DEBIAN_FRONTEND: noninteractive
-      vars:
-        lustre_client:
-          local_path: "{{ lfs_target_path }}"
-          export_host: "{{ lfs_source_IP }}"
-          options: "{{ lfs_options }}"
-          export_path: "{{ lfs_source_path }}"
-          lock: "none"
-      when: add_lfs | default(false) | bool
 
 - name: Configure NHC
   hosts: localhost

@@ -1,0 +1,14 @@
+[Unit]
+Description=JuiceFS Shared Filesystem Mount
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/juicefs mount redis://:JuiceFS-Redis-2026!@10.0.1.251:6379/1 /juicefs --background   --buffer-size 2048   --prefetch 10   --max-uploads 40   --cache-size 8000   --cache-dir /var/oled/jfs_cache   --max-fuse-io 1048576 --max-readahead 2048 --atime-mode=relatime -o allow_other --no-usage-report
+ExecStop=/usr/local/bin/juicefs umount /juicefs
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

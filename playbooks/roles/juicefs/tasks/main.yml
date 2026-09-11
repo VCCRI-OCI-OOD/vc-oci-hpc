@@ -1,0 +1,16 @@
+- name: Create systemd service unit file
+  ansible.builtin.template:
+    src: templates/juicefs.service
+    dest: /etc/systemd/system/juicefs.service
+    mode: "0644"
+
+- name: Reload systemd daemon
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Start and enable the service
+  ansible.builtin.service:
+    name: juicefs
+    state: started
+    enabled: true

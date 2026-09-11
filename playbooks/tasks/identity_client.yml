@@ -1,0 +1,10 @@
+# Configures the host identity client selected by identity_provider.
+- name: Enroll host in the FreeIPA realm
+  ansible.builtin.include_role:
+    name: freeipa-client
+  when: identity_provider == "freeipa"
+
+- name: Set up SSSD against the cluster OpenLDAP server
+  ansible.builtin.include_role:
+    name: sssd
+  when: identity_provider == "openldap"
